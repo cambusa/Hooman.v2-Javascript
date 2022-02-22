@@ -1,0 +1,25 @@
+hooman
+	version 2
+	syntax
+		rules
+			+
+				==> 
+				type (string|number|date)
+			+
+				type number
+				==>
+				value
+					<<number
+						\d+(\.\d+)?
+					>>
+			+
+				type date
+				==>
+				value 
+					<<date[ymd]
+						(\d{4})-(\d{2})
+					>>
+
+item1
+	type date
+	value 2021-10

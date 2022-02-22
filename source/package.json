@@ -1,0 +1,14 @@
+{
+  "name": "hooman",
+  "version": "1.0.0",
+  "description": "hooman management",
+  "main": "hooman.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rodolfo Calzetti",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

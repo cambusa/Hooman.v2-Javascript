@@ -1,0 +1,10 @@
+hooman
+	version 1
+	classifier main
+
+*** includo dati anagrafici protetti
+<-- demoinclude_masterdata.fud
+
+companies @
+companies
+	company YYY

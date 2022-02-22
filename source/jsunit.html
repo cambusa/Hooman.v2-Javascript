@@ -1,0 +1,2084 @@
+<html>
+
+<head>
+<link rel="shortcut icon" href="#">
+
+<style>
+    body{font-family: sans-serif;font-size: 80%;}
+    .title{font-size: 120%;}
+	.success{color: green;}
+    .fail{color: red;}
+    div{padding: 5px;}
+</style>
+
+<script type="module">
+
+	import {HoomanService} from "./HoomanService.js";
+	import {HoomanStatics} from "./HoomanStatics.js";
+    import {HoomanEmbodimentURL} from "./HoomanEmbodimentURL.js";
+    import {HoomanExport2JSON} from "./HoomanExport2JSON.js";
+    import {HoomanExport2HOO} from "./HoomanExport2HOO.js";
+	//import {HoomanService} from "./minify/hooman.js";
+	//import {HoomanStatics} from "./minify/hooman.js";
+    //import {HoomanEmbodimentURL} from "./minify/hooman.js";
+
+    var baseDir = "http://localhost/hooman/fud/";
+
+    class Assert {
+
+        static builtrow (name, success, message) {
+            if (success)  {
+                return "<div><span class='success'>&#9989;</span> " + name + " ( " + message + " )</div>";
+            }
+            else {
+                return "<div><span class='fail'>&#10060;</span> " + name + " ( " + message + " )</div>";
+            }
+        }
+
+        static isTrue (name, actual, message) {
+            if (actual) {
+                document.getElementById("hanger").insertAdjacentHTML("afterend", Assert.builtrow (name, true, message));
+            }
+            else {
+                document.getElementById("hanger").insertAdjacentHTML("afterend", Assert.builtrow (name, false, message));
+            }
+        }
+
+        static areEqual (name, expected, actual, message) {
+            if (expected == actual) {
+                document.getElementById("hanger").insertAdjacentHTML("afterend", Assert.builtrow (name, true, message));
+            }
+            else {
+                document.getElementById("hanger").insertAdjacentHTML("afterend", Assert.builtrow (name, false, message));
+            }
+        }
+
+        static createEmbodiment(baseDir) {
+            return new HoomanEmbodimentURL(baseDir);
+        }
+
+    }
+
+    var tests = [];
+    var count = 0;
+    var terminated = 0;
+
+    document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+///*
+    tests.push({
+        name:"TestFileNotAvailable",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomainXXX.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[File not available] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "File [ " + baseDir +  "demomainXXX.fud ] not available", err.message, err.message);
+
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestLimbBuildPath",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+
+                let p = k.getLimb("fields").getLimb("amount").getLimb("value");
+
+                Assert.areEqual(name, "fields/amount/value", p.buildPath(),
+                                "[Build path] success");
+            })
+            .catch( err => {
+
+                Assert.isTrue(name, false, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestLimbBuildPath2",
+        funct: (name) => { 
+
+            var docBuffer = [];
+
+            docBuffer.push("hooman\n");
+            docBuffer.push("    version 2\n");
+            docBuffer.push("    classifier demo\n");
+            docBuffer.push("    *** includo la sintassi del linguaggio oggetto\n");
+            docBuffer.push("<-- demosyntax.fud\n");
+            docBuffer.push("fields\n");
+            docBuffer.push("    name\n");
+            docBuffer.push("        value Johann Sebastian Bach\n");
+            docBuffer.push("    amount\n");
+            docBuffer.push("        type number\n");
+            docBuffer.push("        value 23.45\n");
+            docBuffer.push("        value2\n");
+            docBuffer.push("text\n");
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parse(docBuffer.join(""));	
+
+            prom
+            .then( k => {
+
+                let p = k.getLimb("hooman").getLimb("syntax").getLimb("structure");
+
+                Assert.areEqual(name, "hooman/syntax/structure", p.buildPath(),
+                                "[Build path] success");
+            })
+            .catch( err => {
+
+                Assert.isTrue(name, false, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestInsertOrderPreservation",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+
+                let s = [];
+
+                for (let l of k.complexValue) {
+                    s.push(l.name);
+                }
+
+                Assert.areEqual(name, "hoomanfieldstextpadre", s.join(""), 
+                                "[Insert order preservation] success");
+            })
+            .catch( err => {
+
+                Assert.isTrue(name, false, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestAccessViolation",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_accessviolation.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Access violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Access violation at row 9", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestAccessViolationGuillemot",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_accessviolationguillemot.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Access violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Access violation at row 9", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPruneWithLocked",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_prunewithlocked.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Access violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Access violation at row 8", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWrongIndentation",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_wrongindentation.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wrong indentation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Wrong indentation at row 2", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWrongIndentation2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_wrongindentation2.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wrong indentation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Wrong indentation at row 6", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWrongIndentation3",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_wrongindentation3.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wrong indentation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Wrong indentation at row 6", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWrongIndentation4",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_wrongindentation4.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wrong indentation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Wrong indentation at row 7", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWrongIndentationGuillemot",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_wrongindentationguillemot.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wrong indentation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Wrong indentation at row 29", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWrongIndentationGuillemot2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_wrongindentationguillemot2.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wrong indentation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Wrong indentation at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWrongIndentationGuillemot3",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_wrongindentationguillemot3.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wrong indentation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Wrong indentation at row 6", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestMandatoryModule",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_mandatorymodule.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Mandatory module] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Module [ masterdata ] is required", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPlusNotResolved",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_plus.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Plus not resolved] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Plus operator cannot be resolved at row 18", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPlusNotResolvedLF2BlankRow",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_plus_lf.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Plus not resolved] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Plus operator cannot be resolved at row 46", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestHoomanAfterData",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_hoomanafterdata.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Hooman after data] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "The hooman branch cannot be changed after data entry at row 8", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestBadVersion",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_badversion.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Bad version] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Version must be an integer at row 2", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestGuillemotEnd",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_guillemotend.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Guillemot End] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Unexpected character at row 10", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestGuillemotEnd2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_guillemotend2.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Guillemot End] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 10", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestGuillemotEnd3",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_guillemotend3.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Guillemot End] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "The guillemots have not a closure at row 10", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestGuillemotEnd4",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_guillemotend4.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Guillemot End] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "The guillemots have not a closure at row 6", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestGuillemotEnd5",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_guillemotend5.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Guillemot End] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "The guillemots have not a closure at row 7", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestGuillemotEnd6",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_guillemotend6.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Guillemot End] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "The guillemots have not a closure at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestIncludeGuillemot",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_includeguillemot.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, true, "[Include and Guillemot] correct");
+
+            })
+            .catch( err => {
+
+                Assert.isTrue(name, false, err.message);
+
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestUnexpected",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_unexpected.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Unexpected] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Unexpected character at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestUnexpected2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_unexpected2.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Unexpected] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Unexpected character at row 1", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestUnexpected3",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_unexpected3.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Unexpected] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Unexpected character at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxErr",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_syntaxerr.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Syntax error] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxErr2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_syntaxerr2.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Syntax error] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxErr3",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_syntaxerr3.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Syntax error] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxErr4",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_syntaxerr4.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Syntax error] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 7", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxErr5",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_syntaxerr5.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Syntax error] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 7", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxErr6",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_syntaxerr6.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Syntax error] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxErr7",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_syntaxerr7.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Syntax error] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxErr8",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_syntaxerr8.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Syntax error] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Syntax error at row 5", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWildcardSiblings",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_wildcardsiblings.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wildcard siblings] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "A wildcard variable cannot have siblings at row 10", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestWildcardSiblings2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_wildcardsiblings2.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Wildcard siblings] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "A wildcard variable cannot have siblings at row 7", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "The [ value 2021-10-300 ] assignment does not match the pattern at row 25", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation2.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Value is not a valid date at row 25", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation3",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation3.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Value is not a valid datetime at row 25", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation4",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation4.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Bad date pattern at row 25: the groups must be 3, 5 or 6", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation5",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation5.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Simple variable [ type ] is mandatory because it is precondition in a rule at row 24", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation6",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation6.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Bad date pattern at row 25: the groups must be 3, 5 or 6", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation7",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation7.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Unmanaged tag [ date[xxx] ] at row 25", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation8",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation8.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Value is not a valid number at row 25", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation9",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation9.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Value is not a valid number at row 25", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestRuleViolation10",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_ruleviolation10.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Rule violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Unmanaged tag [ number[xxx] ] at row 25", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestValidExpression",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_validexpression.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, true, "[Valid expression] success");
+
+            })
+            .catch( err => {
+
+                Assert.isTrue(name, false, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestMandatory",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_mandatory.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Structure violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Variable [ value ] is mandatory below the row 10", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestNotAllowed",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_notallowed.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Structure violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Variable [ dummy ] is not allowed at row 9", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestNotAllowed2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            // Testo unix
+            var prom = s.parseFile("demomain_notallowed2.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Structure violation] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Variable [ dummy ] is not allowed at row 9", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestMultipleRecursions",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_multiplerecursions.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Multiple recursions] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Multiple recursions cannot be nested at the same time at row 10", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestInvalidClassifier",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_invalidclassifier.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.isTrue(name, false, "[Invalid classifier] not detected");
+
+            })
+            .catch( err => {
+
+                Assert.areEqual(name, "Invalid classifier at row 3", err.message, err.message);
+            
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestCaseInsensitive",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+
+                Assert.areEqual(name, "23.45", k.getLimb("fields").getLimb("AMOUNT").getLimb("Value").simpleValue, 
+                                "[Case insensitive] success");
+            
+            })
+            .catch( err => {
+
+                Assert.isTrue(name, true, err.message);
+
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSafeSyntax1",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_safesyntax1.fud");	
+
+            prom
+            .then( k => {
+                Assert.isTrue(name, false, "[Unsafe Syntax] not detected");
+            })
+            .catch( err => {
+                Assert.areEqual(name, "A syntactic section already exists in the main document", err.message, 
+                                "[Unsafe Syntax] detected");
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSafeSyntax2",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_safesyntax2.fud");	
+
+            prom
+            .then( k => {
+                Assert.isTrue(name, false, "[Unsafe Syntax] not detected");
+            })
+            .catch( err => {
+                Assert.areEqual(name, "A syntactic section already exists in an included document", err.message, 
+                                "[Unsafe Syntax] detected");
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestNumericBranchFormula",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_formula.fud");	
+
+            prom
+            .then( k => {
+                Assert.areEqual(name, "2046.9", k.getLimb("records").getLimb("1").getLimb("value2").simpleValue, 
+                                "[Numeric branch formula] solved");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestInitialInclusion",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_initial_inclusion.fud");	
+
+            prom
+            .then( k => {
+                Assert.isTrue(name, true, "No error detected");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestMandatoryPrincipal",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_mandatoryprincipal.fud");	
+
+            prom
+            .then( k => {
+                Assert.isTrue(name, false, "[Mandatory principal] not detected");
+            })
+            .catch( err => {
+                Assert.isTrue(name, true, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxDocument",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_syntaxdocument.fud");	
+
+            prom
+            .then( k => {
+                Assert.isTrue(name, true, "[Mandatory principal] not detected because the document is syntactic");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestSyntaxDocumentWithData",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demosyntax_withdata.fud");	
+
+            prom
+            .then( k => {
+                Assert.isTrue(name, false, "[Syntactic document with data] not detected");
+            })
+            .catch( err => {
+                Assert.areEqual(name, "Syntactic document should not contain any data at row 7", err.message, 
+                    "[Syntactic document with data] detected");
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPathValue",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+                Assert.areEqual(name, "2021-03-31", k.pathValue("fields/tradedate/value", "######"), 
+                                "[Getting value by path] success");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPathValueDefault",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+                Assert.areEqual(name, "######", k.pathValue("fields/tradedate/valuex", "######"), 
+                                "[Getting default by path] success");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPathExists",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+                Assert.isTrue(name, k.pathExists("fields/tradedate/value"), 
+                    "[Path exists] success");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPathNotExists",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+                Assert.isTrue(name, !k.pathExists("fields/tradedate/valuex"), 
+                    "[Path does not exist] success");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestHOO_2_JSON",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain_json.fud");
+
+
+            prom
+            .then( k => {
+                let exporter = new HoomanExport2JSON(k);
+                let document = exporter.export();
+
+                Assert.areEqual(name, "{\"fields\":[\"001\",\"002\",\"003\"]}", document, 
+                document);
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPureList",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demoinclude_list.fud");
+
+
+            prom
+            .then( k => {
+                let exporter = new HoomanExport2HOO(k);
+                let document = exporter.export();
+
+                Assert.areEqual(name, "1 001\n2 002\n3 003\n4 004\n", document, 
+                document);
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+//*/
+
+
+    for (let t of tests) {
+        count++;
+        t.funct(t.name);
+    }
+
+</script>
+
+</head>
+
+<body>
+
+<span class="title">HOOMAN</span><br>
+<br>
+<div id="progress"></div><br>
+<div id="hanger"></div>
+
+</body>
+
+</html>

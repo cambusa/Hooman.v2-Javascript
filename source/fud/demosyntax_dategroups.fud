@@ -1,0 +1,23 @@
+syntax
+	structure
+		fields ...
+			id *
+				type string
+				value !
+				length
+				fields
+		text
+
+	rules
+		1
+			==> 
+			type (string|number|date)
+		+
+			type number
+			==>
+			value \d+(\.\d+)?
+		+
+			type date
+			==>
+			value {(\d{2})(\d{2})-(\d{2})-(\d{2})}
+

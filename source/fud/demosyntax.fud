@@ -1,0 +1,60 @@
+hooman
+	version 2
+	classifier syntax
+	locked
+	syntax !
+		structure
+			validate
+				codtit
+					+ 001 Pippo
+					+ 002 Topolino
+				banca
+					+ 000001 BNL
+					+ 000002 BPM
+					
+			fields ...
+				id *
+					type string
+					value !
+					value2
+					length
+					fields
+				
+			text !
+			padre
+				figlio
+
+		rules
+			1
+				==> 
+				type (string|number|date)
+			+
+				type number
+				==>
+				value
+					<<	number
+						\d+(\.\d+)?
+					>>
+			+
+				type date
+				==>
+				value 
+					<<	date[ymd]
+						(\d{4})-(\d{2})-(\d{2})
+					>>
+			+
+				==>
+				value2 
+					<<	js
+						duplica(BRANCH.value)
+					>>
+		modules
+			syntax
+			
+		library
+			+
+				<<	js
+					function duplica(x){
+						return 2 * x;
+					}
+				>>

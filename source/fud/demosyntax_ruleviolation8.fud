@@ -1,0 +1,25 @@
+hooman
+	version 2
+	syntax
+		rules
+			+
+				==> 
+				type (string|number|date)
+			+
+				type number
+				==>
+				value
+					<<number[.2]
+						x
+					>>
+			+
+				type date
+				==>
+				value 
+					<<date[ymd]
+						(\d{4})-(\d{2})-(\d{2})
+					>>
+
+item1
+	type number
+	value x

@@ -1,0 +1,33 @@
+hooman
+	version 1
+	classifier syntax
+	syntax
+		modules
+			masterdata
+		structure
+			records 
+				id *
+					value
+					value2
+		rules
+			+ 
+				==>
+				value	
+					<< number
+						\d+(\.\d+)?
+					>>
+			+
+				==>
+				value2 
+					<<js
+						funzione()
+					>>
+		library
+			+
+				<<js
+					function funzione(){
+						return 2 * BRANCH.value + 2000;
+					}
+				>>
+
+

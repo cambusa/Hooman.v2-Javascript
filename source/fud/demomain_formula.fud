@@ -1,0 +1,21 @@
+hooman
+	version 1
+	classifier main
+
+*** includo la sintassi del linguaggio oggetto
+<-- demosyntax_formula.fud
+
+*** includo dati anagrafici protetti
+<-- demoinclude_masterdata.fud
+
+records
+	1
+		vaLue 23.45
+		Value2
+		
+	2
+		value 30
+		value2
+
+
+

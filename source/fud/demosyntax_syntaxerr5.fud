@@ -1,0 +1,11 @@
+hooman
+	version 2
+	syntax
+		rules
+			+
+				type number
+				= =>
+				value
+					<<number
+						\d+(\.\d+)?
+					>>

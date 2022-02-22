@@ -1,0 +1,17 @@
+hooman
+	version 1
+
+*** includo la sintassi del linguaggio oggetto
+<-- demosyntax_formula.fud
+
+*** non includo dati anagrafici protetti
+*** <-- demoinclude_masterdata.fud
+
+records
+	1
+		value 23.45
+		value2
+		
+	2
+		value 30
+		value2

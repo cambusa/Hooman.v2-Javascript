@@ -1,0 +1,13 @@
+hooman
+	version 2
+	syntax
+		structure
+			fields ...
+				dummy
+				id *
+					type string
+					value !
+					length
+					fields
+			text
+

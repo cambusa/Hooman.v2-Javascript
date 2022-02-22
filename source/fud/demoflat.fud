@@ -1,0 +1,34 @@
+hooman
+	version 2
+	classifier demo
+	*** includo la sintassi del linguaggio oggetto
+	
+Fields
+	name
+		value Johann Sebastian Bach
+		
+	amount
+		type number
+		value 23.45
+		value2
+		
+	tradedate
+		type date
+		value 2021-03-31
+		
+	memo
+		value
+		fields
+			biography
+				value sòmething
+
+text
+	<<poesia
+	*** Poesiola fresca
+		Per me si va ne la città dolente,
+		per me si va ne l'etterno dolore,
+		per me si va tra la perduta gente.
+	>>
+
+padre
+	figlio

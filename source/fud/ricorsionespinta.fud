@@ -1,0 +1,23 @@
+hooman
+	version 2
+	syntax
+		structure
+			testata
+				fields ...
+					id *
+						type string
+						value !
+						length
+						fields
+	
+testata
+	fields
+		+
+			value 
+			fields
+				+
+					value something
+					fields
+						+
+							value Pippo
+						

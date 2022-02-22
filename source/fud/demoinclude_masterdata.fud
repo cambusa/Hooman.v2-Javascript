@@ -1,0 +1,13 @@
+hooman
+	version 1
+	locked
+	classifier masterdata
+	syntax
+		structure
+			companies
+				company
+
+companies
+	company ACME
+
+

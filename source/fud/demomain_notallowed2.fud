@@ -1,0 +1,9 @@
+hooman
+	version 2
+	syntax
+		structure
+			titolo !
+				nome !
+
+titolo
+	dummy

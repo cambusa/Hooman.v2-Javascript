@@ -1,0 +1,70 @@
+<html>
+
+<head>
+<link rel="shortcut icon" href="#">
+
+<style>
+	span{font-weight: bold;color: navy;}
+</style>
+
+<script type="module">
+
+	import {HoomanService} from "./HoomanService.js";
+	import {HoomanStatics} from "./HoomanStatics.js";
+	//import {HoomanService} from "./minify/hooman.js";
+	//import {HoomanStatics} from "./minify/hooman.js";
+    import {HoomanEmbodimentURL} from "./HoomanEmbodimentURL.js";
+
+	var baseDir = "http://localhost:8080/js/Hooman/fud/";
+
+	var e = new HoomanEmbodimentURL(baseDir);
+	var s = new HoomanService(e);
+	var prom = s.parseFile("demomain.fud");	
+	var h = [];
+	prom
+		.then( k => {
+
+			recursiveDump(k.complexValue, 0);
+			document.getElementById("hanger").innerHTML = h.join("");
+		})
+		.catch( err => {
+			document.getElementById("hanger").innerHTML = err.message;
+		});
+
+	function recursiveDump (limbs, level) {
+
+		for (let l of limbs) {
+			for (let i=0; i<4*level; i++) {
+				h.push("&nbsp;");
+			}
+			
+			h.push("<span>");
+			h.push(l.name);
+			h.push("</span>");
+			
+			if (l.valueType == HoomanStatics.typeComplex) {
+				h.push("<br>");
+				recursiveDump(l.complexValue, level+1);
+			}
+			else {
+				h.push("&nbsp;");
+				h.push(l.simpleValue.replace(/\n/g, "<br>"));
+				h.push("<br>");
+			}
+		}
+	}
+
+</script>
+
+</head>
+
+<body>
+
+HOOMAN<br>
+<br>
+<div id="hanger" style="font-family: 'Courier New', Courier, monospace;">Loading...</div>
+
+
+</body>
+
+</html>

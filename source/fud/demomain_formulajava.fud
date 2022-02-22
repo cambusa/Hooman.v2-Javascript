@@ -1,0 +1,28 @@
+hooman
+	version 1
+	classifier main
+
+*** includo la sintassi del linguaggio oggetto
+<-- demosyntax_formula.fud
+
+*** includo dati anagrafici protetti
+<-- demoinclude_masterdata.fud
+
+records
+	1
+		value 23.45
+		value2
+		
+	2
+		value 30
+		value2
+
+hooman
+	syntax
+		library2
+			<<javascript
+				function funzione(){
+					return 2 * hoo.records.value + 2000;
+				}
+			>>
+
