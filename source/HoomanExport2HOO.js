@@ -55,13 +55,13 @@ export class HoomanExport2HOO {
 					}
 					else if (oVl.constructor.name == "Date") {
 
-						sVl =  ("0" + oVl.getDate()).slice(-2) + "-" + 
-						       ("0"+(oVl.getMonth()+1)).slice(-2) + "-" +
-						       oVl.getFullYear() + "T" + 
-							   ("0" + oVl.getHours()).slice(-2) + ":" + 
-							   ("0" + oVl.getMinutes()).slice(-2) + ":" +
-							   ("0" + oVl.getSeconds()).slice(-2) //
-							   .replace("T00:00:00", "");
+						sVl =  (oVl.getFullYear() + "-" +
+                            ("0"+(oVl.getMonth()+1)).slice(-2) + "-" +
+                            ("0" + oVl.getDate()).slice(-2) + "T" + 
+                            ("0" + oVl.getHours()).slice(-2) + ":" + 
+                            ("0" + oVl.getMinutes()).slice(-2) + ":" +
+                            ("0" + oVl.getSeconds()).slice(-2)) //
+                            .replace("T00:00:00", "");
 
 					}
                     else {

@@ -53,7 +53,7 @@ export class HoomanPhase {
                 let message = "{0}Plus operator cannot be resolved at row {1}".format(doc, line);
                 this.parser.reject({message: message, document: doc, line: line, code: code});
                 throw new Error(message);
-               }
+            }
 
         }
 

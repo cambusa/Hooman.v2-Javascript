@@ -1730,7 +1730,7 @@
                 Assert.isTrue(name, false, "[Unsafe Syntax] not detected");
             })
             .catch( err => {
-                Assert.areEqual(name, "A syntactic section already exists in the main document", err.message, 
+                Assert.areEqual(name, "A syntactic section already exists in an included document", err.message, 
                                 "[Unsafe Syntax] detected");
             })
             .finally( () => {
@@ -2060,9 +2060,63 @@
         }
     });
 
+    tests.push({
+        name:"TestVelvetCustodian",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("velvet_custodian.fud");
+
+
+            prom
+            .then( k => {
+                let exporter = new HoomanExport2HOO(k);
+                let document = exporter.export();
+
+                Assert.areEqual(name, "BRL", k.pathValue("data/currency", "######"), 
+                k.pathValue("data/currency", "######"));
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestVelvetBond",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("bond_data.fud");
+
+
+            prom
+            .then( k => {
+                Assert.areEqual(name, "1982-01-31", k.pathValue("data/issuedate", "######"), 
+                k.pathValue("data/issuedate", "######"));
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
 //*/
-
-
     for (let t of tests) {
         count++;
         t.funct(t.name);

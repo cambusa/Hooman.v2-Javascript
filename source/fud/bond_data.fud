@@ -1,0 +1,10 @@
+hooman
+	version 2
+	classifier data_bond
+<-- bond_syntax.fud
+data
+	issuedate 1982-01-31
+	coupons
+		plan
+			1
+				rate 1

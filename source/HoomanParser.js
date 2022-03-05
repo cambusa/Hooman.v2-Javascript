@@ -125,6 +125,7 @@ export class HoomanParser {
 
         this._currentPhase = value;
 
+        /* mosca
         if (this._currentPhase instanceof HoomanPhaseSyntax) {
 
             let syntaxLevel = this.compound.syntaxLevel;
@@ -164,6 +165,31 @@ export class HoomanParser {
                 this.reject({message: message, document: doc, line: line, code: code});
                 throw new Error(message);
 
+            }
+
+        }
+        */
+
+        if (this._currentPhase instanceof HoomanPhaseSyntax) {
+
+            // Voglio determinare se sono presenti sintassi 
+            // sia nel documento principale sia in documenti inclusi
+            // Se sono presenti dati, questa è una condizione di 
+            // violazione di sicurezza
+
+            //let syntaxLevel = this.compound.syntaxLevel;
+
+            if (this.stackDocuments.topIndex > 1) {
+
+                // Sto analizzando un documento incluso
+                this.compound.syntaxIncluded = true;
+
+            }
+            else {
+
+                // Sto analizzando il documento principale
+                this.compound.syntaxMain = true;
+            
             }
 
         }

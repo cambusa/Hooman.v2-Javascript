@@ -20,7 +20,8 @@ export class HoomanCompound {
         this.isDynamic = false;
 		this.isSyntactic = false;
         this.hasWildcard = false;
-		this.syntaxLevel = 0;
+		this.syntaxMain = false;
+		this.syntaxIncluded = false;
 
 	}
 	

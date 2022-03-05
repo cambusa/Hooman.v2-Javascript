@@ -1,0 +1,24 @@
+hooman
+	version 2
+	classifier syntax_account
+	syntax
+		structure
+
+			data
+				currency
+				settlementdate
+				balances
+					account
+
+		rules
+			+
+				==>
+				currency
+					<<js
+						SELF.substring(0, 3)
+					>>
+data
+	currency BRL REAL BRASILE
+	settlementdate 2021-06-01
+	balances 
+		account 1000

@@ -4,7 +4,7 @@ hooman
 	locked
 	syntax !
 		structure
-			validate
+			_tabular
 				codtit
 					+ 001 Pippo
 					+ 002 Topolino

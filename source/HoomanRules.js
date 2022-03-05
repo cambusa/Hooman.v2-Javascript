@@ -453,15 +453,15 @@ export class HoomanRules {
                 this.scriptJS.push(";");
                 this.scriptJS.push("\n");
 
-                // Oggetto validate 
+                // Oggetto TABULAR 
 
-                this.scriptJS.push("var validate={};");
+                this.scriptJS.push("var TABULAR={};");
                 this.scriptJS.push("\n");
 
-                if (this._parser.compound.pathExists("hooman/syntax/structure/validate")) {
+                if (this._parser.compound.pathExists("hooman/syntax/structure/_tabular")) {
 
-                    let valLimb = this._parser.compound.getLimb("hooman").getLimb("syntax").getLimb("structure").getLimb("validate");
-                    let validate = {};
+                    let valLimb = this._parser.compound.getLimb("hooman").getLimb("syntax").getLimb("structure").getLimb("_tabular");
+                    let _tabular = {};
 
                     if (valLimb.valueType == HoomanStatics.typeComplex) {
                         let valLimbs = valLimb.complexValue;
@@ -474,14 +474,13 @@ export class HoomanRules {
                                         h.push(z.simpleValue);
                                     }
                                 }
-                                validate[v.name.toLowerCase()] = "|" + h.join("|") + "|";
+                                _tabular[v.name.toLowerCase()] = "|" + h.join("|") + "|";
                             }
                         }
                     }
             
-                    for (let i in validate) {
-                        //this.engineJS.execute("validate['" + i + "']='" + validate[i] + "'");
-                        this.scriptJS.push("validate['" + i + "']='" + validate[i] + "'");
+                    for (let i in _tabular) {
+                        this.scriptJS.push("TABULAR['" + i + "']='" + _tabular[i] + "'");
                         this.scriptJS.push("\n");
                     }
 
@@ -552,7 +551,20 @@ export class HoomanRules {
                     }
                 
                 }
-                else {
+
+            }
+
+        }
+
+        if (this.hasSyntaxRules) {
+            this.checkRules(checkType);
+        }
+
+        for (let l of limb.complexValue) {
+
+            if (level > 0 || l.name.toLowerCase() != "hooman") {
+
+                if (l.valueType == HoomanStatics.typeComplex) {
 
                     if (this.hasSyntaxStructure) {
 
@@ -579,10 +591,6 @@ export class HoomanRules {
 
             }
 
-        }
-
-        if (this.hasSyntaxRules) {
-            this.checkRules(checkType);
         }
 
     }

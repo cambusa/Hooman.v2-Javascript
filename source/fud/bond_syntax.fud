@@ -1,0 +1,82 @@
+hooman
+	version 2
+	classifier syntax_bond
+
+hooman
+	version 2
+	classifier syntax_include
+	syntax
+		structure
+			data
+				subtype XXX
+	
+	syntax
+		structure
+			_tabular
+				coupontype
+					+ Regular
+					+ Pro rata
+					+ Irregular
+			data
+				issuedate
+				maturitydate
+				coupons
+					fruitiondate
+					rate
+					interval
+					coupontype					
+					autoplan 
+						<<
+							 
+						>>
+					plan 
+						id *
+							coupondate
+							rate
+					
+		rules
+			+
+				==>
+				issuedate
+					<<date
+						(\d{4})-(\d{2})-(\d{2})
+					>>
+
+				maturitydate
+					<<date
+						(\d{4})-(\d{2})-(\d{2})
+					>>
+				
+				fruitiondate
+					<<date
+						(\d{4})-(\d{2})-(\d{2})
+					>>
+				
+				coupondate
+					<<date
+						(\d{4})-(\d{2})-(\d{2})
+					>>
+				
+				rate
+					<<number
+						\d+(\.\d+)?
+					>>
+
+				interval
+					<<number
+						\d+
+					>>
+					
+				coupontype (Regular|Pro rata|Irregular)
+					
+			+
+				==>
+				autoplan
+					<<js
+						"XXX"
+					>>
+	*** recall syntax				
+	syntax
+		structure
+			data
+				goofy

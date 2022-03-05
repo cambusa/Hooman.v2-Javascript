@@ -3,7 +3,7 @@ hooman
 	classifier demo
 	syntax
 		structure
-			validate
+			_tabular
 				figlio
 					+ 001
 				value

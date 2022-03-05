@@ -38,6 +38,22 @@ export class HoomanPhaseData extends HoomanPhase {
 			}
 		}
 
+		// Essendoci anche dati nel documento, effettuo
+		// un controllo di sicurezza per cui o la sintassi è tutta nel documento
+		// principale o è tutta inclusa
+
+		if (this.parser.compound.syntaxMain && this.parser.compound.syntaxIncluded) {
+
+			// Tested [TestSafeSyntax2]
+			let doc = "";
+			let line = 0;
+			let code = 5;
+			let message = "A syntactic section already exists in an included document";
+			this.parser.reject({message: message, document: doc, line: line, code: code});
+			throw new Error(message);
+
+		}
+
 		if (this.rules.hasSyntaxStructure) {
 
 			var s;

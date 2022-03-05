@@ -102,10 +102,19 @@ export class HoomanPhaseStructure extends HoomanPhase {
 				
 			}
 
-			let s = new HoomanStructureInfo(this.parser, limb.name);
+			if (this.parser.stackInfos.top.infos.exists(limb.name)) {
 
-			this.parser.stackInfos.top.infos.add(s);
-			this.parser.stackInfos.push(s);
+				this.parser.stackInfos.push(this.parser.stackInfos.top.infos.getInfo(limb.name));
+			
+			}
+			else {
+
+				let s = new HoomanStructureInfo(this.parser, limb.name);
+
+				this.parser.stackInfos.top.infos.add(s);
+				this.parser.stackInfos.push(s);
+
+			}
 
 		}
 

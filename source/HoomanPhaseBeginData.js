@@ -28,6 +28,11 @@ export class HoomanPhaseBeginData extends HoomanPhase {
 		this.parser.currentPhase = this.parser.phaseData;
 
 		if (limb !== null) {
+
+			let t = this.stackDocuments.top;
+			this.parser.currentPhase.docRef = t.docRef;
+			this.parser.currentPhase.docRow = t.row;
+
 			this.parser.currentPhase.stackManagement(limb);
 		}
 		

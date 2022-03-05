@@ -16,6 +16,10 @@ export class HoomanStructureInfos {
 
 	}
 
+    exists (name) {
+        return this._collItem.has(name);
+    }
+
     getInfo (name) {
 
         name = name.toLowerCase();
