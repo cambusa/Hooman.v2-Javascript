@@ -70,14 +70,4 @@ export class HoomanService {
 
     }
 
-    exportStructureJSON(compound) {
-
-        let p = compound.getLimb("hooman").getLimb("syntax").getLimb("structure");
-
-        let expJSON = new HoomanExportStructure2JSON(p);
-
-        return expJSON.export();
-
-    }
-	
 }

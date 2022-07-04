@@ -455,12 +455,13 @@ export class HoomanRules {
 
                 // Oggetto TABULAR 
 
-                this.scriptJS.push("var TABULAR={};");
-                this.scriptJS.push("\n");
+                //this.scriptJS.push("var TABULAR={};");
+                //this.scriptJS.push("\n");
 
-                if (this._parser.compound.pathExists("hooman/syntax/structure/_tabular")) {
+                //if (this._parser.compound.pathExists("hooman/syntax/structure/_tabular")) {
+                if (this._parser.compound.pathExists("hooman/syntax/tabular")) {
 
-                    let valLimb = this._parser.compound.getLimb("hooman").getLimb("syntax").getLimb("structure").getLimb("_tabular");
+                    let valLimb = this._parser.compound.getLimb("hooman").getLimb("syntax").getLimb("tabular");
                     let _tabular = {};
 
                     if (valLimb.valueType == HoomanStatics.typeComplex) {
@@ -474,22 +475,30 @@ export class HoomanRules {
                                         h.push(z.simpleValue);
                                     }
                                 }
-                                _tabular[v.name.toLowerCase()] = "|" + h.join("|") + "|";
+                                //_tabular[v.name.toLowerCase()] = "|" + h.join("|") + "|";
+                                _tabular[v.name.toLowerCase()] = h;
                             }
                         }
                     }
             
-                    for (let i in _tabular) {
-                        this.scriptJS.push("TABULAR['" + i + "']='" + _tabular[i] + "'");
-                        this.scriptJS.push("\n");
-                    }
+                    //for (let i in _tabular) {
+                    //    this.scriptJS.push("TABULAR['" + i + "']='" + _tabular[i] + "'");
+                    //    this.scriptJS.push("\n");
+                    //}
+                    this.scriptJS.push("var TABULAR=");
+                    this.scriptJS.push(JSON.stringify(_tabular));
+                    this.scriptJS.push(";\n");
 
                 }
-        
+                else {
+
+                    this.scriptJS.push("var TABULAR={};\n");
+
+                }
+
                 // Caricamento
                 let sourceJS = this.scriptJS.join("");
                 this.engineJS = new HoomanEngineJS(sourceJS);
-                //this.engineJS.execute(sourceJS);
 
                 //-------------------------------------------------------
                 // Esecuzione ricorsiva delle regole attive (javascript)

@@ -22,29 +22,15 @@ export class HoomanLimbs {
 
 	}
 	
-    getValue (name, defaultValue = null) {
+    getValue (name, defaultValue = "") {
 
         name = name.toLowerCase();
 
-        if (defaultValue !== null) {
-
-            if (this._collItem.has(name)) {
-                return this._collItem.get(name).simpleValue;
-            }
-            else {
-                return defaultValue;
-            }
-
+        if (this._collItem.has(name)) {
+            return this._collItem.get(name).simpleValue;
         }
         else {
-
-            if (this._collItem.has(name)) {
-                return this._collItem.get(name).complexValue;
-            }
-            else{
-                return new HoomanLimbs(this.parent);
-            }
-
+            return defaultValue;
         }
 
     }
@@ -58,6 +44,19 @@ export class HoomanLimbs {
         }
         else {
             return new HoomanLimb(name, this.parent);
+        }
+
+    }
+
+    getLimbs (name) {
+
+        name = name.toLowerCase();
+
+        if (this._collItem.has(name)) {
+            return this._collItem.get(name).complexValue;
+        }
+        else{
+            return new HoomanLimbs(this.parent);
         }
 
     }

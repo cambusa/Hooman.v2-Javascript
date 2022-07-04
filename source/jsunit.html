@@ -1897,6 +1897,32 @@
     });
 
     tests.push({
+        name:"TestMotleyGetting",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+                Assert.areEqual(name, "2021-03-31", k.getLimbs("fields").getLimb("tradedate").getValue("value", "######"), 
+                                "[Getting limbs/limb/value] success");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
         name:"TestPathValue",
         funct: (name) => { 
 
@@ -1908,6 +1934,58 @@
             .then( k => {
                 Assert.areEqual(name, "2021-03-31", k.pathValue("fields/tradedate/value", "######"), 
                                 "[Getting value by path] success");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPathLimb",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+                Assert.areEqual(name, "2021-03-31", k.pathLimb("fields/tradedate/value").simpleValue, 
+                                "[Getting limb by path] success");
+            })
+            .catch( err => {
+                Assert.isTrue(name, false, err.message);
+            })
+            .finally( () => {
+
+                terminated++;
+                document.getElementById("progress").innerHTML = "Terminated " + terminated + " of " + count;
+
+            });
+
+        }
+    });
+
+    tests.push({
+        name:"TestPathLimbs",
+        funct: (name) => { 
+
+            var e = Assert.createEmbodiment(baseDir);
+            var s = new HoomanService(e);
+            var prom = s.parseFile("demomain.fud");	
+
+            prom
+            .then( k => {
+                Assert.areEqual(name, "2021-03-31", k.pathLimb("fields/tradedate").getLimb("value").simpleValue, 
+                                "[Getting limbs by path] success");
             })
             .catch( err => {
                 Assert.isTrue(name, false, err.message);

@@ -121,21 +121,18 @@ export class HoomanLimb {
 
     }
 
+	getValue (name, defaultValue = "") {
+    	return this._complexValue.getValue(name, defaultValue);
+	}
+
     getLimb (name) {
 		return this._complexValue.getLimb(name);
 	}
 	
-	getValue (name, defaultValue = null) {
-
-		if (defaultValue === null) {
-			return this._complexValue.getValue(name);
-        }
-		else {
-			return this._complexValue.getValue(name, defaultValue);
-        }
-
+    getLimbs (name) {
+		return this._complexValue.getLimbs(name);
 	}
-
+	
     get lastLimb () {
 
         if (this._complexValue.count() > 0) {

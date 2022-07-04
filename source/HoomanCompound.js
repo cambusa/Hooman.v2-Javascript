@@ -75,6 +75,48 @@ export class HoomanCompound {
 
 	}
 
+	pathLimb (pathName) {
+		
+		try {
+
+			let pathArray = pathName.split("/");
+			let l = this.limb.complexValue;
+			let i;
+
+			for (i = 0; i <= pathArray.length - 2; i++) {
+				l = l.getLimb( pathArray[i] ).complexValue;
+			}
+
+			return l.getLimb( pathArray[i] );
+
+		}
+		catch (ex) {
+			return false;
+		}
+
+	}
+
+	pathLimbs (pathName) {
+		
+		try {
+
+			let pathArray = pathName.split("/");
+			let l = this.limb.complexValue;
+			let i;
+
+			for (i = 0; i <= pathArray.length - 1; i++) {
+				l = l.getLimb( pathArray[i] ).complexValue;
+			}
+
+			return l;
+
+		}
+		catch (ex) {
+			return false;
+		}
+
+	}
+
 	pathExists (pathName) {
 
 		try {
@@ -113,19 +155,16 @@ export class HoomanCompound {
 		return this.limb;
 	}
 	
+	getValue (name, defaultValue = "") {
+		return this.limb.complexValue.getValue(name, defaultValue);
+	}
+	
 	getLimb (name) {
 		return this.limb.complexValue.getLimb(name);
 	}
 	
-	getValue (name, defaultValue = null) {
-
-		if (defaultValue !== null) {
-			return this.limb.complexValue.getValue(name);
-		}
-		else {
-			return this.limb.complexValue.getValue(name, defaultValue);
-		}
-
+	getLimbs (name) {
+		return this.limb.complexValue.getLimbs(name);
 	}
 	
     get lastLimb () {
