@@ -435,13 +435,11 @@ export class HoomanRules {
 
                 this._parser.compound.isDynamic = true;
 
-                this.scriptJS.push("var SELF=false;");
-                this.scriptJS.push("\n");
-                this.scriptJS.push("var BRANCH={};");
-                this.scriptJS.push("\n");
-                this.scriptJS.push("var PATH=[];");
-                this.scriptJS.push("\n");
-                this.scriptJS.push("var HOO=");
+                this.scriptJS.push("'use strict';\n");
+                this.scriptJS.push("let SELF=false;\n");
+                this.scriptJS.push("let BRANCH={};\n");
+                this.scriptJS.push("let PATH=[];\n");
+                this.scriptJS.push("let HOO=");
 
                 var jsonHoo = new HoomanExport2JSON(this._parser.compound, false);
 
@@ -485,14 +483,14 @@ export class HoomanRules {
                     //    this.scriptJS.push("TABULAR['" + i + "']='" + _tabular[i] + "'");
                     //    this.scriptJS.push("\n");
                     //}
-                    this.scriptJS.push("var TABULAR=");
+                    this.scriptJS.push("let TABULAR=");
                     this.scriptJS.push(JSON.stringify(_tabular));
                     this.scriptJS.push(";\n");
 
                 }
                 else {
 
-                    this.scriptJS.push("var TABULAR={};\n");
+                    this.scriptJS.push("let TABULAR={};\n");
 
                 }
 

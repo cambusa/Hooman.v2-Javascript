@@ -17,6 +17,7 @@ export class HoomanEngineJS {
 	}
 	
 	invoke (formula) {
-		return eval(this._codebase + formula + "();");
+		let F = new Function(this._codebase + "return " + formula + "();");
+		return F();
 	}
 }
