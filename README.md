@@ -1,7 +1,7 @@
 # Hooman.v2-Javascript
 __Javascript parser for Hooman v2 metalanguage - 2023 Rodolfo Calzetti__
 
-_License: GNU Lesser General Public License v3.0_
+_License: MIT_
 
 A hooman document _"demomain.fud"_ is given:
 ```
