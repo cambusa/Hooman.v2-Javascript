@@ -30,7 +30,7 @@ var e = new HoomanEmbodimentFile("c:/dev/");
 var s = new HoomanService(e);
 
 s.parseFile("demomain.fud")
-.then ( (compound) => {
+.then ( (k) => {
 
     let v;
 
