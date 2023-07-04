@@ -24,7 +24,7 @@ fields
 ```
 The simplest use cases for NodeJS are listed below:
 ```
-const {HoomanService, HoomanEmbodimentFile} = require ("./hooman/hoomanode");
+const {HoomanService, HoomanEmbodimentFile} = require ("./minify/hoomanode");
 
 var e = new HoomanEmbodimentFile("c:/dev/");
 var s = new HoomanService(e);
